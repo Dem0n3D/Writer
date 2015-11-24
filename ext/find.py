@@ -1,5 +1,5 @@
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import Qt
+from PySide import QtGui, QtCore
+from PySide.QtCore import Qt
 
 import re
 
