@@ -4,11 +4,11 @@ from PySide.QtCore import Qt
 
 from ext import *
 
-class Main(QtGui.QMainWindow):
+class Main(QtGui.QDialog):
 
     def __init__(self, app, parent = None):
 
-        QtGui.QMainWindow.__init__(self,parent)
+        super(Main, self).__init__(parent)
 
         self.app = app
 
@@ -122,7 +122,9 @@ class Main(QtGui.QMainWindow):
         # Must use lambda, otherwise text isn't updated?
         linkAction.triggered.connect(lambda: link.Link(self).show())
 
-        self.toolbar = self.addToolBar("Options")
+        self.toolbar = QtGui.QToolBar()
+        self.toolbar.setWindowTitle("Options")
+        self.layout().insertWidget(0, self.toolbar)
 
         self.toolbar.addAction(self.newAction)
         self.toolbar.addAction(self.openAction)
@@ -150,12 +152,8 @@ class Main(QtGui.QMainWindow):
         self.toolbar.addAction(imageAction)
         self.toolbar.addAction(linkAction)
 
-        self.toolbar.addSeparator()
-
         self.toolbar.addAction(bulletAction)
         self.toolbar.addAction(numberedAction)
-
-        self.addToolBarBreak()
 
     def initFormatbar(self):
 
@@ -215,7 +213,9 @@ class Main(QtGui.QMainWindow):
         backColor = QtGui.QAction(QtGui.QIcon("icons/highlight.png"),"Change background color",self)
         backColor.triggered.connect(self.highlight)
 
-        self.formatbar = self.addToolBar("Format")
+        self.formatbar = QtGui.QToolBar()
+        self.formatbar.setWindowTitle("Format")
+        self.layout().insertWidget(1, self.formatbar)
 
         self.formatbar.addWidget(fontBox)
         self.formatbar.addWidget(fontSize)
@@ -248,7 +248,8 @@ class Main(QtGui.QMainWindow):
 
     def initMenubar(self):
 
-        menubar = self.menuBar()
+        menubar = QtGui.QMenuBar()
+        self.layout().setMenuBar(menubar)
 
         file = menubar.addMenu("File")
         edit = menubar.addMenu("Edit")
@@ -353,7 +354,11 @@ class Main(QtGui.QMainWindow):
 
         # Make the scrollArea take up the whole space of
         # the MainWindow
-        self.setCentralWidget(self.scrollArea)
+        main_layout = QtGui.QVBoxLayout(self)
+        main_layout.addWidget(self.scrollArea)
+        main_layout.setSpacing(3)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(main_layout)
 
         # Connect documentSizeChanged signal to handler, to resize QTextEdit and scroll down
         self.text.document().documentLayout().documentSizeChanged.connect(self.handleDocumentSize)
@@ -371,7 +376,8 @@ class Main(QtGui.QMainWindow):
 
     def initStatus(self):
 
-        self.status = self.statusBar()
+        self.status = QtGui.QStatusBar()
+        self.layout().addWidget(self.status)
 
         self.status.setStyleSheet("background-color: #A0A0A0;")
 
