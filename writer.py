@@ -4,13 +4,11 @@ from PySide.QtCore import Qt
 
 from ext import *
 
-class Main(QtGui.QDialog):
+class EditorWidget(QtGui.QWidget):
 
-    def __init__(self, app, parent = None):
+    def __init__(self, parent = None):
 
-        super(Main, self).__init__(parent)
-
-        self.app = app
+        super(EditorWidget, self).__init__(parent)
 
         self.filename = ""
 
@@ -374,10 +372,9 @@ class Main(QtGui.QDialog):
         # To monitor unsaved changes
         self.text.textChanged.connect(self.changed)
 
-    def initStatus(self):
+    def setStatusBar(self, statusbar):
 
-        self.status = QtGui.QStatusBar()
-        self.layout().addWidget(self.status)
+        self.status = statusbar
 
         self.status.setStyleSheet("background-color: #A0A0A0;")
 
@@ -396,7 +393,6 @@ class Main(QtGui.QDialog):
         self.initToolbar()
         self.initFormatbar()
         self.initMenubar()
-        self.initStatus()
 
         self.setMinimumSize(995,900)
         self.move(450,25)
@@ -489,7 +485,7 @@ class Main(QtGui.QDialog):
                 openAction.triggered.connect(lambda: link.openHyperlink(hyperlink))
 
                 copyAction = QtGui.QAction("Copy hyperlink",self)
-                copyAction.triggered.connect(lambda: self.app.clipboard().setText(hyperlink))
+                copyAction.triggered.connect(lambda: QtGui.QApplication.instance().clipboard().setText(hyperlink))
 
                 removeAction = QtGui.QAction("Remove hyperlink",self)
                 removeAction.triggered.connect(lambda: link.removeHyperlink(cursor))
@@ -656,9 +652,10 @@ class Main(QtGui.QDialog):
         self.status.setVisible(not state)
 
     def new(self):
-
-        spawn = Main(self.app)
-
+        editor = EditorWidget()
+        spawn = QtGui.QMainWindow(self)
+        spawn.setCentralWidget(editor)
+        editor.setStatusBar(spawn.statusBar())
         spawn.show()
 
     def open(self):
@@ -961,7 +958,11 @@ def main():
 
     app = QtGui.QApplication(sys.argv)
 
-    main = Main(app)
+    editor = EditorWidget()
+
+    main = QtGui.QMainWindow()
+    main.setCentralWidget(editor)
+    editor.setStatusBar(main.statusBar())
     main.show()
 
     sys.exit(app.exec_())
